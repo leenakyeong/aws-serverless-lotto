@@ -96,6 +96,6 @@ EC2 기반으로 운영되던 로또 조회 서비스를 더 낮은 비용과 �
 - GCP 기반 분석 / 멀티클라우드 연계 구조 구체화
 
 ## Links
-- Live Service: `https://svc.nagom.io`
-- Portfolio: `(추가 예정)`
-- Repository: `(현재 GitHub 저장소 주소)`
+- Live Service: [svc.nagom.io](https://svc.nagom.io)
+- Portfolio: (추가 예정)
+- Repository: [GitHub Repository](https://github.com/skrud9418/aws-serverless-lotto)
