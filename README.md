@@ -98,4 +98,4 @@ EC2 기반으로 운영되던 로또 조회 서비스를 더 낮은 비용과 �
 ## Links
 - Live Service: [svc.nagom.io](https://svc.nagom.io)
 - Portfolio: (추가 예정)
-- Repository: [GitHub Repository](https://github.com/skrud9418/aws-serverless-lotto)
+- Repository: [GitHub Repository](https://github.com/leenakyeong/aws-serverless-lotto)
