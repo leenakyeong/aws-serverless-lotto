@@ -79,7 +79,7 @@ S3를 직접 공개하지 않고 CloudFront만 Origin에 접근하도록 구성�
 
 ## 5. Current Status
 
-### 완료
+## 완료
 - [x] EventBridge → Lambda → S3 데이터 수집 파이프라인 구성
 - [x] 회차별 이력 데이터 및 최신 데이터 저장 구조 구성
 - [x] web/data 버킷 분리
@@ -89,11 +89,24 @@ S3를 직접 공개하지 않고 CloudFront만 Origin에 접근하도록 구성�
 - [x] AWS WAF Rate Limit / 국가 제한 적용
 - [x] `svc.nagom.io` 서브도메인 기반 서비스 연결
 
-### 진행 예정
+## 진행 예정
 - [ ] **Infrastructure as Code**: Terraform 기반 전체 리소스 코드화
 - [ ] **Observability Hardening**: CloudWatch 알람 및 운영 지표 정리
 - [ ] **Backfill Automation**: 누락 회차 자동 적재 및 초기 적재 보완
 - [ ] **Architecture Expansion**: 멀티클라우드/GCP 기반 분석 확장 검토
+
+## 다음 실습 트랙 (EC2 운영형 확장)
+- [ ] **EC2 운영형 실습 환경 구성**: Single AZ + On-Demand + Ubuntu + `t4g.small` 기준 검토
+- [ ] **인스턴스 선정 근거 정리**: T 계열 선택 이유, Graviton2(ARM) 기반 가성비, `x86_64` / `arm64` 호환성 검토
+- [ ] **CLI 기본기 학습**: 파일/권한/프로세스/포트/로그/서비스 관리 명령 익히기
+- [ ] **리눅스 표준 디렉토리 구조 학습**: `/etc`, `/var/log`, `/opt`, `/srv` 기준으로 설정/로그/서비스 경로 구분
+- [ ] **운영 스택 구성**: EC2 + Docker + Nginx Reverse Proxy + systemd 자동기동
+- [ ] **systemd 운영 실습**: `/etc/systemd/system` 유닛 파일 직접 관리, Restart 정책 적용
+- [ ] **Nginx 운영형 설정 반영**: `proxy_set_header`, `client_max_body_size` 등 실제 운영 설정 포함
+- [ ] **운영 증빙 정리**: 장애 재시작 테스트, 로그 확인, 포트 확인 등 운영 기록 남기기
+- [ ] **IaC 확장**: 위 운영형 실습 환경을 Terraform으로 코드화
+- [ ] **멀티클라우드 데이터 연계 검토**: AWS S3 로또 데이터를 GCP GCS/BigQuery로 연계
+- [ ] **GCP 분석 확장**: BigQuery ML 기반 빈도/분포/패턴 분석 실습
 
 ---
 
