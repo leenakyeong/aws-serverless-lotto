@@ -1,101 +1,117 @@
-# AWS Serverless Lotto
+# AWS Serverless Lotto Architecture
 
-EC2 기반으로 운영되던 로또 조회 서비스를 더 낮은 비용과 적은 운영 부담으로 재구성하기 위해 만든 서버리스 프로젝트.
+주기적으로 실행되는 로또 데이터 수집 서비스를, 상시 실행 EC2 대신 **Event-Driven Serverless Architecture**로 재구성한 프로젝트다.  
+불필요한 고정비를 줄이고, 운영 포인트를 단순화하는 데 초점을 두었다.
 
-## Overview
-이 프로젝트는 로또 데이터를 주기적으로 수집해 S3에 저장하고, CloudFront를 통해 정적 웹에서 조회할 수 있도록 구성한 서비스다.
+---
 
-기존처럼 항상 켜져 있는 서버를 운영하는 대신, EventBridge, Lambda, S3, CloudFront를 활용해 주기성 작업에 맞는 서버리스 구조로 전환했다.  
-현재는 `https://svc.nagom.io` 서브도메인으로 분리 배포해 실제 서비스 형태로 운영하고 있다.
+## 1. Project Background
 
-## Why
-기존 EC2 기반 로또 서비스는 월 비용이 발생하고, 가끔 다운되며, 항상 켜져 있는 서버를 관리해야 하는 부담이 있었다.
+기존 구조는 주 1회 수준의 작업을 위해 서버를 계속 켜 두어야 했고, 작은 서비스임에도 운영 확인 포인트가 계속 발생했다.  
+이 프로젝트에서는 이런 비효율을 줄이기 위해, 필요한 시점에만 실행되는 서버리스 구조로 전환했다.
 
-이 프로젝트는 이런 문제를 바탕으로 다음 목표를 두고 설계했다.
+### 목표
+- **Fixed Cost Reduction**: 상시 실행 서버를 제거하고 사용량 기반 구조로 전환
+- **Operational Overhead Reduction**: 관리형 서비스를 중심으로 운영 포인트 축소
+- **Secure Delivery**: S3 직접 공개를 막고 CloudFront 기반으로만 배포
+- **Stable Static Serving**: 정적 웹과 데이터 제공 경로를 분리해 단순하고 예측 가능한 구조 구성
 
-- 상시 실행 서버 제거
-- 운영 단순화
-- 장애 포인트 축소
-- 비용 최소화
-- 정적 웹 기반의 가벼운 서비스 구성
+---
 
-## Architecture
-- **EventBridge**: 정해진 시각에 로또 수집 작업 실행
-- **Lambda**: 로또 데이터 수집 및 JSON 생성
-- **S3 (data bucket)**: 회차별 데이터와 `latest.json` 저장
-- **S3 (web bucket)**: 정적 웹 파일 저장
-- **CloudFront**: 정적 웹 배포 및 `/data/*` 경로 라우팅
-- **OAC**: S3를 직접 공개하지 않고 CloudFront만 접근 허용
-- **WAF**: 기본 보호, rate limit, 국가 제한 적용
-- **CloudWatch / SNS**: 모니터링 및 알림 구성
+## 2. Architecture Overview
 
-## Tech Stack
-- Amazon EventBridge
-- AWS Lambda
-- Amazon S3
-- Amazon CloudFront
-- AWS WAF
-- Amazon CloudWatch
-- Amazon SNS
-- AWS Certificate Manager (ACM)
-- HTML
-- CSS
-- JavaScript
+### Event Pipeline
+- **EventBridge**: 정해진 시간에 수집 작업 트리거
+- **Lambda**: 로또 API 호출 및 데이터 가공
+- **S3 (data bucket)**: 회차별 이력 데이터와 최신 데이터 저장
 
-## Key Features
-- 최신 회차 데이터 조회
-- 회차별 JSON 이력 저장
-- 정적 웹에서 latest / round 데이터 조회
-- 서버리스 기반 주기 실행
-- CloudFront 캐시 정책 분리 적용
-- 커스텀 도메인 + HTTPS 적용
+### Web Delivery
+- **S3 (web bucket)**: 정적 웹 리소스 저장
+- **CloudFront**: 웹 페이지 및 JSON 데이터 배포
+- 기본 경로는 web bucket, `/data/*` 경로는 data bucket으로 분리 구성
 
-## Current Status
-- EventBridge → Lambda → S3 데이터 적재 완료
-- web/data 버킷 분리 완료
-- CloudFront 단일 배포에서 web / data 경로 분기 완료
-- OAC 적용으로 S3 비공개 접근 구성 완료
-- 커스텀 도메인 및 ACM 인증서 적용 완료
-- `svc.nagom.io` 서브도메인 분리 배포 완료
-- 정적 웹에서 latest / round 데이터 조회 가능
-- WAF rate limit 및 국가 제한 적용 완료
-- CloudWatch Alarm 및 SNS 알림 연동 완료
-- GCP 기반 멀티클라우드 확장 작업 진행 중
+### Security
+- **OAC (Origin Access Control)**: CloudFront를 통해서만 S3 접근 허용
+- **AWS WAF**: Rate Limit 및 국가 제한 적용
+- **ACM / Route 53**: HTTPS 및 커스텀 도메인 연결
 
-## Security
-- S3 직접 공개 차단
-- CloudFront OAC 기반 접근
-- AWS WAF 기본 보호 적용
-- rate-limit 규칙 적용
-- 한국 외 요청 차단 규칙 적용
+### Monitoring
+- **CloudWatch**: Lambda 실행 로그 및 알람 기반 감시
+- **SNS**: 이상 상황 알림 전송
 
-## Cost Optimization
-- 상시 실행 EC2 없이 이벤트 기반으로만 실행
-- S3 정적 파일 저장 구조 사용
-- CloudFront 캐시 활용으로 원본 요청 감소
-- 필요 시에만 Lambda 실행되는 구조로 운영
+---
 
-## Data Structure
-- latest: `data/lotto/latest.json`
-- history: `data/lotto/round/{round}.json`
+## 3. Tech Stack
 
-## Domain
-- Live Service: `https://svc.nagom.io`
+| Category | Tech / AWS Service |
+| :--- | :--- |
+| **Compute** | AWS Lambda |
+| **Storage** | Amazon S3 |
+| **Eventing** | Amazon EventBridge |
+| **Network & Delivery** | Amazon CloudFront, Route 53, ACM |
+| **Security** | AWS WAF, OAC, IAM |
+| **Monitoring** | Amazon CloudWatch, SNS |
+| **Frontend** | HTML, CSS, Vanilla JavaScript |
 
-## Project Direction
-이 프로젝트는 단순한 로또 조회 페이지가 아니라,  
-주기성 데이터 수집 작업을 서버리스 아키텍처로 어떻게 단순하고 저렴하게 운영할 수 있는지 보여주기 위한 포트폴리오 프로젝트다.
+---
 
-또한 AWS 기반 서버리스 구조를 중심으로 구현한 뒤, 이후 GCP를 포함한 멀티클라우드 방향으로도 확장 가능성을 검토하고 있다.
+## 4. Key Engineering Decisions
 
-## Next Steps
-- 정적 웹 UI 개선
-- README 아키텍처 다이어그램 추가
-- Terraform으로 인프라 코드화
-- CloudWatch / SNS 운영 기준 정교화
-- GCP 기반 분석 / 멀티클라우드 연계 구조 구체화
+### 4-1. Always-On Server 대신 Event-Driven 구조 선택
+이 서비스는 실시간 상시 처리보다 주기적 실행에 가까운 성격이므로, EC2를 계속 유지하는 방식보다 EventBridge + Lambda 조합이 더 적합하다고 판단했다.
 
-## Links
-- Live Service: [svc.nagom.io](https://svc.nagom.io)
-- Portfolio: (추가 예정)
-- Repository: [GitHub Repository](https://github.com/leenakyeong/aws-serverless-lotto)
+### 4-2. Web Bucket / Data Bucket 분리
+정적 웹 파일과 회차 데이터의 성격이 다르기 때문에 버킷을 분리했다.  
+이렇게 하면 배포 경로, 캐시 정책, 접근 제어를 목적에 맞게 나눌 수 있다.
+
+### 4-3. latest.json과 round 이력 데이터의 캐시 성격 분리
+최신 회차 데이터는 즉시 반영이 중요하고, 회차별 이력 데이터는 변경 가능성이 낮다.  
+그래서 `latest.json`은 캐시를 최소화하고, `round/*.json`은 캐시를 유지하는 방향으로 구성했다.
+
+### 4-4. S3 직접 공개 대신 CloudFront + OAC 적용
+S3를 직접 공개하지 않고 CloudFront만 Origin에 접근하도록 구성해, 정적 콘텐츠 배포 경로를 단순화하면서 공개 범위를 통제했다.
+
+### 4-5. 최소 비용 범위 내 보안 적용
+과도한 보안 비용을 추가하기보다, 프로젝트 성격에 맞는 최소 수준의 보호를 적용했다.  
+현재는 CloudFront 앞단에 WAF를 두고, Rate Limit과 국가 제한 규칙을 운영 중이다.
+
+---
+
+## 5. Current Status
+
+### 완료
+- [x] EventBridge → Lambda → S3 데이터 수집 파이프라인 구성
+- [x] 회차별 이력 데이터 및 최신 데이터 저장 구조 구성
+- [x] web/data 버킷 분리
+- [x] CloudFront 단일 배포에서 경로 기반 라우팅 구성
+- [x] OAC를 통한 S3 비공개 접근 구성
+- [x] 정적 웹에서 최신 회차 조회 및 회차별 조회 기능 구현
+- [x] AWS WAF Rate Limit / 국가 제한 적용
+- [x] `svc.nagom.io` 서브도메인 기반 서비스 연결
+
+### 진행 예정
+- [ ] **Infrastructure as Code**: Terraform 기반 전체 리소스 코드화
+- [ ] **Observability Hardening**: CloudWatch 알람 및 운영 지표 정리
+- [ ] **Backfill Automation**: 누락 회차 자동 적재 및 초기 적재 보완
+- [ ] **Architecture Expansion**: 멀티클라우드/GCP 기반 분석 확장 검토
+
+---
+
+## 6. Why This Project Matters
+
+이 프로젝트는 단순히 로또 데이터를 보여주는 웹 페이지를 만드는 것이 아니라,  
+**작은 주기성 서비스를 어떤 구조로 운영하면 비용과 운영 부담을 줄일 수 있는지**를 직접 설계하고 구현해 본 작업이다.
+
+특히 아래와 같은 판단을 실제로 다뤘다.
+
+- 상시 서버가 필요한가, 아니면 이벤트 기반 실행이 더 적합한가
+- 최신 데이터와 이력 데이터는 같은 캐시 정책을 써도 되는가
+- S3를 직접 공개할 것인가, CloudFront를 앞단에 둘 것인가
+- 작은 서비스에서 어느 수준까지 보안과 비용을 함께 고려할 것인가
+
+---
+
+## 7. Repository / Demo
+
+- **Demo**: `https://svc.nagom.io`
+- **Repository**: `https://github.com/nakyeong/aws-serverless-lotto`
