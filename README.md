@@ -90,23 +90,27 @@ S3를 직접 공개하지 않고 CloudFront만 Origin에 접근하도록 구성�
 - [x] `svc.nagom.io` 서브도메인 기반 서비스 연결
 
 ## 진행 예정
-- [ ] **Infrastructure as Code**: Terraform 기반 전체 리소스 코드화
+- [ ] **IaC 확장**: 위 운영형 실습 환경을 Terraform으로 코드화
 - [ ] **Observability Hardening**: CloudWatch 알람 및 운영 지표 정리
 - [ ] **Backfill Automation**: 누락 회차 자동 적재 및 초기 적재 보완
-- [ ] **Architecture Expansion**: 멀티클라우드/GCP 기반 분석 확장 검토
 
 ## 다음 실습 트랙 (EC2 운영형 확장)
-- [ ] **EC2 운영형 실습 환경 구성**: Single AZ + On-Demand + Ubuntu + `t4g.small` 기준 검토
-- [ ] **인스턴스 선정 근거 정리**: T 계열 선택 이유, Graviton2(ARM) 기반 가성비, `x86_64` / `arm64` 호환성 검토
-- [ ] **CLI 기본기 학습**: 파일/권한/프로세스/포트/로그/서비스 관리 명령 익히기
-- [ ] **리눅스 표준 디렉토리 구조 학습**: `/etc`, `/var/log`, `/opt`, `/srv` 기준으로 설정/로그/서비스 경로 구분
-- [ ] **운영 스택 구성**: EC2 + Docker + Nginx Reverse Proxy + systemd 자동기동
-- [ ] **systemd 운영 실습**: `/etc/systemd/system` 유닛 파일 직접 관리, Restart 정책 적용
-- [ ] **Nginx 운영형 설정 반영**: `proxy_set_header`, `client_max_body_size` 등 실제 운영 설정 포함
-- [ ] **운영 증빙 정리**: 장애 재시작 테스트, 로그 확인, 포트 확인 등 운영 기록 남기기
-- [ ] **IaC 확장**: 위 운영형 실습 환경을 Terraform으로 코드화
-- [ ] **멀티클라우드 데이터 연계 검토**: AWS S3 로또 데이터를 GCP GCS/BigQuery로 연계
-- [ ] **GCP 분석 확장**: BigQuery ML 기반 빈도/분포/패턴 분석 실습
+* Infrastructure as Code (IaC) 및 운영 환경 코드화
+- [ ] Terraform 기반 AWS 리소스 코드화
+- [ ] 반복 가능한 인프라 관리 구조 학습
+- [ ] 서버리스 및 운영형 인프라 재현 자동화 구성
+* Docker 기반 운영 환경 실습
+- [ ] Docker 기반 서비스 운영 환경 구성
+- [ ] Nginx Reverse Proxy 기반 요청 전달 구조 실습
+- [ ] systemd 기반 서비스 자동 기동 및 Restart 정책 구성
+- [ ] 서비스 안정성을 고려한 운영 환경 구성 실습
+* Kubernetes 및 컨테이너 오케스트레이션 학습
+- [ ] Kubernetes 클러스터 운영 기술 학습
+- [ ] Pod / Deployment / Service / ConfigMap / Secret 구성 실습
+- [ ] kubectl 기반 리소스 관리 및 상태 추적 학습
+- [ ] YAML 기반 선언형 구성 방식 학습
+- [ ] CKA(Certified Kubernetes Administrator) 자격 취득 준비
+- [ ] ECS/EKS 기반 운영 구조 확장 검토
 
 ---
 
